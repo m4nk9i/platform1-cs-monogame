@@ -8,6 +8,7 @@ namespace platform1_cs_monogame;
 public class Game1 : Game
 {
     private Level level;
+    private Player player1;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
@@ -34,6 +35,7 @@ public class Game1 : Game
         IsMouseVisible = true;
 
         level=new Level("Content/level0.json");
+        player1=new Player();
     }
 
     protected override void Initialize()
@@ -98,8 +100,16 @@ public class Game1 : Game
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+            player1.accel.X=0;
+            player1.accel.Y=0;
+        if (Keyboard.GetState().IsKeyDown(Keys.Left)) player1.accel.X=-0.1f;
+        if (Keyboard.GetState().IsKeyDown(Keys.Right)) player1.accel.X=0.1f;
 
         // TODO: Add your update logic here
+
+        player1.update(gameTime);
+
+        viewMatrix = Matrix.CreateLookAt(new Vector3(0f, 0f, -100f), new Vector3( player1.position.X,0f, 0f), new Vector3(0f, 1f, 0f));
 
         base.Update(gameTime);
     }
@@ -116,6 +126,8 @@ public class Game1 : Game
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
             GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+            
 
             //Turn off culling so we see both sides of our rendered triangle
             RasterizerState rasterizerState = new RasterizerState();

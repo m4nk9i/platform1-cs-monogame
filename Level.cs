@@ -127,10 +127,7 @@ public class Level
        // System.Console.WriteLine("888"+this.toStr(""));
     }
 
-    public void LoadLeagues(string ppath)
-    {
-  
-    }
+
 
     public string toStr(string pindent)
     {
