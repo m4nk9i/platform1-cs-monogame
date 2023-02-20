@@ -10,7 +10,7 @@ public class Game1 : Game
     private Level level;
     private Player player1;
     private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
+    //private SpriteBatch _spriteBatch;
 
     private Texture2D texture1;
 
@@ -44,7 +44,7 @@ public class Game1 : Game
     
         base.Initialize();
 
-                _spriteBatch = new SpriteBatch(GraphicsDevice);
+    //            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         FileStream fileStream = new FileStream("Content/texture_a2.png", FileMode.Open);
         texture1 = Texture2D.FromStream(GraphicsDevice, fileStream);
@@ -102,14 +102,17 @@ public class Game1 : Game
             Exit();
             player1.accel.X=0;
             player1.accel.Y=0;
-        if (Keyboard.GetState().IsKeyDown(Keys.Left)) player1.accel.X=-0.1f;
-        if (Keyboard.GetState().IsKeyDown(Keys.Right)) player1.accel.X=0.1f;
+        if (Keyboard.GetState().IsKeyDown(Keys.Left)) player1.accel.X=-0.05f;
+        if (Keyboard.GetState().IsKeyDown(Keys.Right)) player1.accel.X=0.05f;
+        if (Keyboard.GetState().IsKeyDown(Keys.Up)) player1.accel.Y=-0.05f;
 
         // TODO: Add your update logic here
 
         player1.update(gameTime);
 
-        viewMatrix = Matrix.CreateLookAt(new Vector3(0f, 0f, -100f), new Vector3( player1.position.X,0f, 0f), new Vector3(0f, 1f, 0f));
+//        viewMatrix = Matrix.CreateLookAt(new Vector3(player1.position.X, player1.position.Y, -100f), new Vector3( player1.position.X,player1.position.Y, 0f), new Vector3(0f, 1f, 0f));
+
+        viewMatrix = Matrix.CreateLookAt(new Vector3(-20f, -15f, -50f), new Vector3( player1.position.X,player1.position.Y+25f, 0f), new Vector3(0f, -1f, 0f));
 
         base.Update(gameTime);
     }
@@ -137,12 +140,13 @@ public class Game1 : Game
             foreach(EffectPass pass in basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 300);
+                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 900);
             }
+            /*
            _spriteBatch.Begin();
             _spriteBatch.Draw(texture1, destinationRectangle: new Rectangle(50, 50, 150, 300),new Color(255,255,255));
             _spriteBatch.End();
-
+*/
         base.Draw(gameTime);
     }
 }

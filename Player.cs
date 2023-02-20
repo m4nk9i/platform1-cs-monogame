@@ -20,7 +20,14 @@ public class Player
     public void update(GameTime pgt)
     {
         vel+=accel;
+        vel.Y+=0.03f;
         position+=vel;
+        if (position.Y>0)
+        {
+            position.Y=0;
+            vel.Y=0;
+            accel.Y=0;
+        }
     }
 
     public VertexPositionColorTexture[] getVertexbuffer()

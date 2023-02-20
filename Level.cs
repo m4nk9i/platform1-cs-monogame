@@ -3,57 +3,28 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Text.Json;
 using System.IO;
-
-public class Tile
-{
-    public enum t_type
-    {
-        t_Empty=0,
-        t_Solid=1,
-        t_Water=2
-
-    }
-    public enum t_graphics
-    {
-        g_Empty=0,
-        g_Ground,
-        g_Cave,
-        g_GroundGrassTop,
-        g_EmptyLadder,
-        g_CaveLadder,
-        g_Water
-    }
-    public t_type type;
-    public t_graphics graphics;
-
-    public Tile():this(t_type.t_Empty,t_graphics.g_Empty)
-    {
-
-    }
-
-    public Tile(t_type ptype,t_graphics pgraphics)
-    {
-        this.graphics=pgraphics;
-        this.type=ptype;
-    }
-
-    public void set(t_type ptype,t_graphics pgraphics)
-    {
-        this.graphics=pgraphics;
-        this.type=ptype;
-    //    System.Console.WriteLine(ptype+" "+pgraphics);
-    }
-
-    public string ToStr(string pindent)
-    {
-        return this.type.ToString();
-    }
+using System.Collections.Generic;
 
 
-}
+
 
 public class Level
 {
+    
+    public  class tfrag
+    {
+        public float x1,x2;
+        public float y1,y2;
+
+        public tfrag(float px1, float py1, float px2, float py2)
+        {
+            x1=px1;
+            y1=py1;
+            x2=px2;
+            y2=py2;
+        }
+    }; 
+    public tfrag[] tatlas;
     public int height,width;
     Tile [,] grid;
     public Level()
@@ -98,6 +69,11 @@ public class Level
             k++;
         }
 
+        tatlas=new tfrag[3];
+        tatlas[0]=new tfrag(0,0,0.330f,1);
+        tatlas[1]=new tfrag(0.340f,0,0.660f,1);
+        tatlas[2]=new tfrag(0.670f,0,1,1);
+        
 
     }
 
@@ -143,10 +119,21 @@ public class Level
         return tstr;
 
     }
+    public void addQuad(List<VertexPositionColorTexture> pbuffer, Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4,int tindex )
+    {
+        pbuffer.Add(new VertexPositionColorTexture(v1,new Color(255,255,255),new Vector2(tatlas[tindex].x1,tatlas[tindex].y1)));
+        pbuffer.Add(new VertexPositionColorTexture(v2,new Color(255,255,255),new Vector2(tatlas[tindex].x2,tatlas[tindex].y1)));
+        pbuffer.Add(new VertexPositionColorTexture(v4,new Color(255,255,255),new Vector2(tatlas[tindex].x1,tatlas[tindex].y2)));
+      
+        pbuffer.Add(new VertexPositionColorTexture(v4,new Color(255,255,255),new Vector2(tatlas[tindex].x1,tatlas[tindex].y2)));
+        pbuffer.Add(new VertexPositionColorTexture(v2,new Color(255,255,255),new Vector2(tatlas[tindex].x2,tatlas[tindex].y1)));
+        pbuffer.Add(new VertexPositionColorTexture(v3,new Color(255,255,255),new Vector2(tatlas[tindex].x2,tatlas[tindex].y2)));
+        
+    }
 
     public VertexPositionColorTexture[] getVertexbuffer()
     {
-        VertexPositionColorTexture[] tbuffer=new VertexPositionColorTexture[6*width*height];
+        List<VertexPositionColorTexture> lbuffer=new List<VertexPositionColorTexture>();
         
         for (int i=0;i<width;i++)
         {
@@ -157,23 +144,40 @@ public class Level
                 {
                     case Tile.t_type.t_Solid:
                     {
-                        tbuffer[(i*height+j)*6  ]=new VertexPositionColorTexture(new Vector3(    i*5,    j*5,0),new Color(i*20,j*20,255),new Vector2(1,1));
-                        tbuffer[(i*height+j)*6+1]=new VertexPositionColorTexture(new Vector3((i+1)*5,(j+1)*5,0),new Color(i*20,j*20,255),new Vector2(0,0));
-                        tbuffer[(i*height+j)*6+2]=new VertexPositionColorTexture(new Vector3(    i*5,(j+1)*5,0),new Color(i*20,j*20,255),new Vector2(1,0));
- 
-                        tbuffer[(i*height+j)*6+3]=new VertexPositionColorTexture(new Vector3(    i*5,    j*5,0),new Color(i*20,j*20,255),new Vector2(1,1));
-                        tbuffer[(i*height+j)*6+4]=new VertexPositionColorTexture(new Vector3((i+1)*5,(j+1)*5,0),new Color(i*20,j*20,255),new Vector2(0,0));
-                        tbuffer[(i*height+j)*6+5]=new VertexPositionColorTexture(new Vector3((i+1)*5,    j*5,0),new Color(i*20,j*20,255),new Vector2(0,1));
+                        addQuad(lbuffer,
+                            new Vector3(    i*5,    j*5,0),
+                            new Vector3((1+i)*5,    j*5,0),
+                            new Vector3((1+i)*5,(1+j)*5,0),
+                            new Vector3(    i*5,(1+j)*5,0),
+                            1
+                            );
+                       addQuad(lbuffer,
+                            new Vector3(    i*5,    j*5,0),
+                            new Vector3((1+i)*5,    j*5,0),
+                            new Vector3((1+i)*5,    j*5,5),
+                            new Vector3(    i*5,    j*5,5),
+                            2
+                            );
+                        addQuad(lbuffer,
+                            new Vector3(    i*5,    j*5,0),
+                            new Vector3(    i*5,    j*5,5),
+                            new Vector3(    i*5,(1+j)*5,5),
+                            new Vector3(    i*5,(1+j)*5,0),
+                            1
+                            );
+                            
+                        addQuad(lbuffer,
+                            new Vector3((1+i)*5,    j*5,0),
+                            new Vector3((1+i)*5,    j*5,5),
+                            new Vector3((1+i)*5,(1+j)*5,5),
+                            new Vector3((1+i)*5,(1+j)*5,0),
+                            1
+                            );
+
                     }break;
                     case Tile.t_type.t_Empty:
                     {
-                        tbuffer[(i*height+j)*6  ]=new VertexPositionColorTexture(new Vector3(    i*5,    j*5,0),new Color(i*20,j*20,255),new Vector2(1,1));
-                        tbuffer[(i*height+j)*6+1]=new VertexPositionColorTexture(new Vector3((i+0.1f)*5,(j+0.1f)*5,0),new Color(i*20,j*20,255),new Vector2(0,0));
-                        tbuffer[(i*height+j)*6+2]=new VertexPositionColorTexture(new Vector3(    i*5,(j+0.1f)*5,0),new Color(i*20,j*20,255),new Vector2(1,0));
- 
-                        tbuffer[(i*height+j)*6+3]=new VertexPositionColorTexture(new Vector3(    i*5,    j*5,0),new Color(i*20,j*20,255),new Vector2(1,1));
-                        tbuffer[(i*height+j)*6+4]=new VertexPositionColorTexture(new Vector3((i+0.1f)*5,(j+0.1f)*5,0),new Color(i*20,j*20,255),new Vector2(0,0));
-                        tbuffer[(i*height+j)*6+5]=new VertexPositionColorTexture(new Vector3((i+0.1f)*5,    j*5,0),new Color(i*20,j*20,255),new Vector2(0,1));
+
                     }break;      
                     default:break;              
                 }
@@ -182,6 +186,12 @@ public class Level
             }
         }
 
+        VertexPositionColorTexture[] tbuffer=new VertexPositionColorTexture[lbuffer.Count];
+        for(int i=0;i<lbuffer.Count;i++)
+        {
+            tbuffer[i]=lbuffer[i];
+        }
+        
         return tbuffer;
     }
 }
